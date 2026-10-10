@@ -54,8 +54,24 @@ a { color: var(--wine); }
 }
 .top .cta-sm:hover { background: var(--wine-deep); }
 
-/* 첫 화면 */
-.hero { padding: 72px 0 88px; }
+/* 첫 화면: 상차림 사진 위에 제목 */
+.hero {
+  position: relative;
+  padding: 104px 0 96px;
+  color: #fff;
+  background: #1F1A17 url("https://images.unsplash.com/photo-1708388065153-8b8b29c700c3?w=2000&q=75&auto=format&fit=crop") center / cover no-repeat;
+}
+.hero::before {
+  content: ""; position: absolute; inset: 0;
+  background: linear-gradient(100deg, rgba(20,14,12,.93) 0%, rgba(20,14,12,.84) 50%, rgba(20,14,12,.55) 100%);
+}
+.hero .wrap { position: relative; }
+.hero h1 { border-left-color: #E7B9C8; }
+.hero .sub { color: #F3EEEA; text-shadow: 0 1px 12px rgba(0,0,0,.6); }
+.hero h1 { text-shadow: 0 2px 20px rgba(0,0,0,.4); }
+.hero .btn.ghost { color: #fff; border-color: rgba(255,255,255,.7); }
+.hero .btn.ghost:hover { background: rgba(255,255,255,.12); }
+.hero .offer { color: var(--ink); box-shadow: 0 30px 60px -20px rgba(0,0,0,.5); border-color: transparent; }
 .hero .wrap { display: grid; gap: 48px; align-items: center; }
 .hero .wrap { gap: 40px; }
 @media (min-width: 880px) {
@@ -69,7 +85,7 @@ a { color: var(--wine); }
   border-left: 3px solid var(--wine);
   padding-left: 22px;
 }
-.hero .sub { margin-top: 24px; font-size: 18px; color: var(--muted); max-width: 30em; }
+.hero .sub { margin-top: 24px; font-size: 18px; max-width: 30em; }
 .actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 36px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center;
@@ -128,10 +144,28 @@ section { padding: 96px 0; scroll-margin-top: 64px; }
 .qa strong { display: block; font-size: 22px; font-weight: 700; }
 .qa span { display: block; margin-top: 6px; color: var(--muted); font-size: 16px; }
 
+/* 업종 사진 카드 */
+.shops { display: grid; gap: 16px; margin-top: 44px; }
+@media (min-width: 760px) { .shops { grid-template-columns: repeat(3, 1fr); gap: 20px; } }
+.shop { margin: 0; }
+.shop img {
+  display: block; width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover;
+  border-radius: 18px; background: var(--mist);
+}
+@media (max-width: 759px) { .shop img { aspect-ratio: 16 / 10; } }
+.shop figcaption { margin-top: 14px; }
+.shop strong { display: block; font-size: 20px; font-weight: 700; }
+.shop span { display: block; margin-top: 4px; color: var(--muted); font-size: 16px; }
+
 /* 홍보 방법 */
+.tips-layout { display: grid; gap: 40px; }
+@media (min-width: 960px) { .tips-layout { grid-template-columns: 1fr 360px; gap: 64px; align-items: start; } }
+.tips-photo { position: sticky; top: 96px; margin: 0; }
+.tips-photo img { display: block; width: 100%; height: auto; aspect-ratio: 3 / 4; object-fit: cover; border-radius: 20px; }
+@media (max-width: 959px) { .tips-photo { position: static; } .tips-photo img { aspect-ratio: 16 / 9; } }
 .tips { display: grid; gap: 0; margin-top: 44px; border-top: 1px solid var(--line); }
 .tip { display: grid; gap: 6px 40px; padding: 28px 0; border-bottom: 1px solid var(--line); }
-@media (min-width: 760px) { .tip { grid-template-columns: 280px 1fr; } }
+@media (min-width: 760px) { .tip { grid-template-columns: 240px 1fr; } }
 .tip h3 { font-size: 21px; font-weight: 700; }
 .tip p { color: var(--muted); }
 .bridge {
@@ -253,8 +287,32 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
     </div>
   </section>
 
-  <section aria-labelledby="tips-title">
+  <section aria-labelledby="shops-title">
     <div class="wrap">
+      <div class="head">
+        <h2 id="shops-title">이런 가게에 잘 맞아요</h2>
+        <p>손님이 사진과 리뷰를 보고 고르는 가게일수록 체험단 리뷰가 힘이 돼요.</p>
+      </div>
+      <div class="shops">
+        <figure class="shop">
+          <img src="https://images.unsplash.com/photo-1730900737760-1352d4d2af84?w=900&q=75&auto=format&fit=crop" alt="놋그릇에 담긴 비빔밥과 반찬이 차려진 상" loading="lazy" width="900" height="1125">
+          <figcaption><strong>한식·한정식</strong><span>정갈한 상차림을 사진으로 먼저 보여 주세요.</span></figcaption>
+        </figure>
+        <figure class="shop">
+          <img src="https://images.unsplash.com/photo-1568254183919-78a4f43a2877?w=900&q=75&auto=format&fit=crop" alt="갓 구운 빵이 가득한 베이커리 진열대" loading="lazy" width="900" height="1125">
+          <figcaption><strong>베이커리</strong><span>오늘 나온 빵이 리뷰 사진으로 쌓여요.</span></figcaption>
+        </figure>
+        <figure class="shop">
+          <img src="https://images.unsplash.com/photo-1728761390316-935ffeb3fbcc?w=900&q=75&auto=format&fit=crop" alt="햇살이 드는 창가 자리가 있는 카페" loading="lazy" width="900" height="1125">
+          <figcaption><strong>카페</strong><span>분위기와 자리가 궁금한 손님에게 답이 돼요.</span></figcaption>
+        </figure>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="tips-title">
+    <div class="wrap tips-layout">
+     <div>
       <div class="head">
         <h2 id="tips-title">네이버플레이스, 이것부터 챙기세요</h2>
         <p>손님은 가게에 오기 전에 네이버플레이스를 먼저 봐요. 사장님이 오늘 바로 할 수 있는 것부터 정리했어요.</p>
@@ -277,6 +335,12 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
           <p>좋은 리뷰에도 아쉬운 리뷰에도 짧게 답해 주세요. 다음 손님이 사장님의 태도를 보고 골라요.</p>
         </div>
       </div>
+     </div>
+      <figure class="tips-photo">
+        <img src="https://images.unsplash.com/photo-1593443320739-77f74939d0da?w=800&q=75&auto=format&fit=crop" alt="나무 테이블 위 햇살 속 라떼 한 잔" loading="lazy" width="800" height="1067">
+      </figure>
+    </div>
+    <div class="wrap">
       <div class="bridge">
         <div>
           <h3>그런데 리뷰가 하나도 없다면요?</h3>
@@ -368,7 +432,7 @@ footer { border-top: 1px solid var(--line); padding: 32px 0 48px; color: var(--m
 </main>
 
 <footer>
-  <div class="wrap">플레이스 체험단</div>
+  <div class="wrap">플레이스 체험단 · 사진: <a href="https://unsplash.com" rel="noopener">Unsplash</a></div>
 </footer>
 
 <script>
