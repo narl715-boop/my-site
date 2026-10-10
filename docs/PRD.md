@@ -62,6 +62,7 @@
 - 분위기: 세련된 · 세리프 서체(Noto Serif KR) · 흰 바탕에 와인색 강조 하나 (2026-10-11 "따뜻한"에서 변경)
 - 참고 디자인: https://dinnerqueen.net/ads — 그대로 베끼지 않고 구성과 분위기만 (큰 제목, 단계별 진행, 사례 카드, 빠른 문의 버튼)
 - 문의 저장: 예 → Supabase(leaderpl-admin 스킬) + /admin
+- 유입 추적: UTM(utm_source·medium·campaign·term·content)을 30일 기억했다가 문의와 함께 저장. /admin에서 출처별 문의 수와 추적 링크 만들기
 - 회원가입: 이번엔 아니요
 - 배포: GitHub 공개 저장소 + Vercel
 

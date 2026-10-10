@@ -60,6 +60,20 @@ button.primary { background: var(--marigold); border-color: var(--marigold); col
 .status { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 12px; }
 .status button[aria-pressed="true"] { background: var(--leaf); border-color: var(--leaf); color: #fff; font-weight: 700; }
 .empty { color: var(--muted); padding: 24px 0; }
+.src { margin-top: 8px; font-size: 14px; color: var(--muted); overflow-wrap: anywhere; }
+.src b { color: var(--ink); font-weight: 700; }
+.panel { background: var(--paper); border: 1px solid var(--line); border-radius: 14px; padding: 16px; margin-bottom: 16px; }
+.panel h2 { font-size: 17px; margin: 0 0 10px; }
+.tally { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.tally li { display: flex; justify-content: space-between; gap: 12px; }
+.maker { display: grid; gap: 10px; }
+.maker label { display: grid; gap: 4px; font-size: 14px; color: var(--muted); }
+.maker input {
+  font: inherit; font-size: 16px; padding: 10px 12px; min-height: 46px;
+  border: 1px solid var(--line); border-radius: 10px; background: var(--paper); color: var(--ink);
+}
+.maker output { display: block; padding: 10px 12px; background: var(--butter); border-radius: 10px; overflow-wrap: anywhere; font-size: 14px; }
+details summary { cursor: pointer; font-weight: 700; }
 </style>
 </head>
 <body>
@@ -83,6 +97,32 @@ button.primary { background: var(--marigold); border-color: var(--marigold); col
       </span>
     </div>
     <p class="err" id="board-err" role="alert" hidden></p>
+
+    <div class="panel">
+      <h2>어디서 문의가 왔나요</h2>
+      <ul class="tally" id="tally"></ul>
+    </div>
+
+    <details class="panel">
+      <summary>추적 링크 만들기</summary>
+      <form class="maker" id="maker" style="margin-top:12px">
+        <label>어디에 보낼 링크인가요 (utm_source)
+          <input name="utm_source" placeholder="예: visit, kakao, instagram" required>
+        </label>
+        <label>어떤 방식인가요 (utm_medium)
+          <input name="utm_medium" placeholder="예: direct, message, qr">
+        </label>
+        <label>캠페인 이름 (utm_campaign)
+          <input name="utm_campaign" placeholder="예: 2026-10-mapo">
+        </label>
+        <label>가게나 메모 (utm_content)
+          <input name="utm_content" placeholder="예: 새싹공방">
+        </label>
+        <output id="maker-out">받는 곳을 적으면 링크가 만들어져요.</output>
+        <button type="button" id="maker-copy">링크 복사</button>
+      </form>
+    </details>
+
     <div class="cards" id="cards"></div>
   </div>
 
@@ -131,7 +171,26 @@ button.primary { background: var(--marigold); border-color: var(--marigold); col
     return n;
   }
 
+  function renderTally(rows) {
+    var counts = {};
+    rows.forEach(function (r) {
+      var k = r.utm_source || '(링크 없음)';
+      counts[k] = (counts[k] || 0) + 1;
+    });
+    var box = $('tally');
+    box.textContent = '';
+    var keys = Object.keys(counts).sort(function (a, b) { return counts[b] - counts[a]; });
+    if (!keys.length) { box.appendChild(el('li', null, '아직 문의가 없어요.')); return; }
+    keys.forEach(function (k) {
+      var li = el('li');
+      li.appendChild(el('span', null, k));
+      li.appendChild(el('b', null, counts[k] + '건'));
+      box.appendChild(li);
+    });
+  }
+
   function render(rows) {
+    renderTally(rows);
     $('new-count').textContent = rows.filter(function (r) { return r.status === '새 문의'; }).length;
     var box = $('cards');
     box.textContent = '';
@@ -150,6 +209,16 @@ button.primary { background: var(--marigold); border-color: var(--marigold); col
         store.textContent = row.store;
       }
       c.appendChild(store);
+
+      var src = el('div', 'src');
+      if (row.utm_source) {
+        src.appendChild(el('b', null, row.utm_source));
+        var rest = [row.utm_medium, row.utm_campaign, row.utm_content].filter(Boolean).join(' / ');
+        if (rest) src.appendChild(document.createTextNode(' · ' + rest));
+      } else {
+        src.textContent = row.referrer ? '링크 없이 들어옴 · ' + row.referrer : '링크 없이 직접 들어옴';
+      }
+      c.appendChild(src);
 
       var copy = el('button', 'copy', row.contact + ' 복사');
       copy.type = 'button';
@@ -201,6 +270,33 @@ button.primary { background: var(--marigold); border-color: var(--marigold); col
     load().catch(function (e) { e.auth ? showLogin(e.message) : showErr(e.message); });
   });
   $('logout').addEventListener('click', function () { showLogin(''); });
+
+  // 추적 링크 만들기
+  function makeLink() {
+    var f = $('maker').elements;
+    var p = new URLSearchParams();
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content'].forEach(function (k) {
+      var v = f[k].value.trim().replace(/\s+/g, '-');
+      if (v) p.set(k, v);
+    });
+    if (!p.get('utm_source')) return '';
+    return location.origin + '/?' + p.toString();
+  }
+  $('maker').addEventListener('input', function () {
+    $('maker-out').textContent = makeLink() || '받는 곳을 적으면 링크가 만들어져요.';
+  });
+  $('maker-copy').addEventListener('click', function () {
+    var link = makeLink();
+    if (!link) { $('maker-out').textContent = '받는 곳(utm_source)을 먼저 적어 주세요.'; return; }
+    var b = $('maker-copy');
+    navigator.clipboard.writeText(link).then(function () {
+      b.textContent = '복사했어요';
+      setTimeout(function () { b.textContent = '링크 복사'; }, 1500);
+    }, function () {
+      var s = window.getSelection(), r = document.createRange();
+      r.selectNodeContents($('maker-out')); s.removeAllRanges(); s.addRange(r);
+    });
+  });
 
   if (getPw()) load().catch(function (e) { showLogin(e.auth ? e.message : ''); });
   else $('pw').focus();

@@ -14,6 +14,10 @@ module.exports = async (req, res) => {
   if (typeof b === 'string') { try { b = JSON.parse(b); } catch { b = {}; } }
   if (b.website) return res.status(200).json({ ok: true }); // 스팸 함정 칸(사람에게는 안 보임)
   const row = { name: clip(b.name, 50), contact: clip(b.contact, 100), store: clip(b.store, 300), consent: b.consent === true };
+  // 유입 경로(UTM) — 없으면 비워 둔다
+  for (const k of ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']) row[k] = clip(b[k], 100) || null;
+  row.landing_page = clip(b.landing_page, 300) || null;
+  row.referrer = clip(b.referrer, 300) || null;
   if (!row.name || !row.contact || !row.store) return res.status(400).json({ error: '이름, 연락처, 가게 이름을 모두 적어 주세요.' });
   if (!row.consent) return res.status(400).json({ error: '개인정보 수집·이용에 동의해 주세요.' });
   const r = await fetch(`${SB_URL}/rest/v1/inquiries`, { method: 'POST', headers: { ...sbHeaders(), Prefer: 'return=minimal' }, body: JSON.stringify(row) });
